@@ -89,11 +89,24 @@ module RSpec::Matchers::DeepEq
 		end
 
 		def hashes_matches?(actual, expected, path)
-			return false unless actual.keys.sort == expected.keys.sort
+			valid = true
 			actual.each do |key, value|
-				return false unless m? value, expected[key], "#{path}.#{key}"
+				if actual.include? key
+					valid &&= m? value, expected[key], "#{path}[#{key.inspect}]"
+				else
+					valid = false
+					add_bad_attr(nil, value, "#{path}[#{key.inspect}]")
+				end
 			end
-			true
+			if actual.keys.sort != expected.keys.sort
+				valid = false
+				expected.each do |key, value|
+					unless actual.include? key
+						add_bad_attr(value, nil, "#{path}[#{key.inspect}]")
+					end
+				end
+			end
+			return valid
 		end
 
 	end
