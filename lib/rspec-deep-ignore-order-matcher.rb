@@ -34,18 +34,15 @@ module RSpec::Matchers::DeepEq
 	  private
 
 	  def generic_failure_message(_not=" ")
-			if is_array? or is_hash?
-				msg = "expected that #{actual.class} would#{_not}be deep equal with "+
-				"#{expected.class}"
-				# Adding diff information for hashes and arrays
-				self.bad_attrs.inject(msg) do |msg, bad_attr|
-					msg+
-					"\n#{bad_attr[:path]} was #{bad_attr[:actual].inspect}"+
-					", expected #{bad_attr[:expected].inspect}"
-				end
-			else
-				"expected that #{actual} would#{_not}be deep equal with "+
+			unless is_array? or is_hash?
+				return "expected that #{actual} would#{_not}be deep equal with "+
 				"#{expected}"
+			end
+			# Adding diff information for hashes and arrays
+			self.bad_attrs.inject("") do |msg, bad_attr|
+				msg+
+				"\n#{bad_attr[:path]} was #{bad_attr[:actual].inspect}"+
+				", expected #{bad_attr[:expected].inspect}"
 			end
 		end
 
